@@ -1,0 +1,15 @@
+httpOnly (boolean) -Crucial for Security.
+Prevents client-side JS from accessing the cookie (blocks XSS attacks).
+
+secure (boolean) -	If true, the cookie is sent only over HTTPS.
+
+
+sameSite (Strict,Lax,None) - Controls cross-site request behavior. Can be 'Strict', 'Lax', or 'None'.
+
+
+
+The Three sameSite Options
+Value	Behavior	Local Dev Impact
+Strict	Cookie is only sent if the request originates from the same site.	Works fine on localhost.
+Lax	(Default in modern browsers) Sent on same-site requests and top-level navigations (links).	Usually the safest bet for local dev.
+None	Sent on all requests (cross-site).	Requires secure: true, which means you must have HTTPS locally.

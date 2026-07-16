@@ -2,23 +2,24 @@ import UserColumns from "../../../models/userColumnsSchema/userColumnsSchema.js"
 import columns from "../../../models/columnsSchema/columnsSchema.js";
 import Tasks from "../../../models/tasksSchema/tasksSchema.js";
 import UserTasks from "../../../models/userTasksSchema/userTasksSchema.js";
+import AppError from "../../../errorHandlers/AppError.js";
 const deleteUserColumns = async (req, res, next) => {
   try {
-    const { userId } = req.params;
-    if (!userId) {
-      return next(new Error("userId is required"));
-    }
+    const userId = req.user.id;
     const userCols = await UserColumns.findOneAndDelete({ userId });
 
     if (!userCols) {
-      return next(new Error("user columns were not found"));
+      const error = new AppError("user columns not found", 404);
+
+      return next(error);
     }
 
     const { userColumns } = userCols;
 
     const userTasksToDelete = await UserTasks.findOneAndDelete({ userId });
     if (!userTasksToDelete) {
-      return next(new Error("user tasks were not found"));
+      const error = new AppError("user tasks were not found", 404);
+      return next(error);
     }
 
     await columns.deleteMany({ userId, id: { $in: userColumns } });

@@ -1,3 +1,4 @@
+import AppError from "../../../errorHandlers/AppError.js";
 import columns from "../../../models/columnsSchema/columnsSchema.js";
 import UserColumns from "../../../models/userColumnsSchema/userColumnsSchema.js";
 
@@ -7,7 +8,8 @@ const getColumns = async (req, res, next) => {
 
     const userCols = await UserColumns.findOne({ userId });
     if (!userCols) {
-      return next(new Error(`kanban  was not found`));
+      const error = new AppError("kanbnan not found", 404);
+      return next(error);
     }
 
     const { userColumns } = userCols;

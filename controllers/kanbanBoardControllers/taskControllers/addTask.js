@@ -1,20 +1,14 @@
+import AppError from "../../../errorHandlers/AppError.js";
 import Tasks from "../../../models/tasksSchema/tasksSchema.js";
 import UserTasks from "../../../models/userTasksSchema/userTasksSchema.js";
 
 const addTask = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const { columnId } = req.params;
-    if (!columnId) {
-      return next(new Error("columnId is required"));
-    }
+    const { columnId } = res.loclas.safeParams;
 
     const id = crypto.randomUUID();
-    const { title } = req.body;
-    if (!title || !userId) {
-      return next(new Error("title and userId required"));
-    }
-
+    const { title } = res.locals.safeBody;
     const userTasksColumn = await UserTasks.findOneAndUpdate(
       { userId },
       { $push: { userTasks: id } },
@@ -22,14 +16,15 @@ const addTask = async (req, res, next) => {
     );
 
     if (!userTasksColumn) {
-      return next(new Error("User tasks column not found"));
+      const error = new AppError("User tasks column not found", 404);
+      return next(error);
     }
 
     await Tasks.create({ id, userId, title, columnId });
 
     return res
       .status(201)
-      .json({ message: "task has been added successfully" });
+      .json({ message: "task has been added successfully", id });
   } catch (error) {
     next(error);
   }

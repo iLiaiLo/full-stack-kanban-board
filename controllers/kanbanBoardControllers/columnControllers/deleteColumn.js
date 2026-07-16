@@ -1,3 +1,4 @@
+import AppError from "../../../errorHandlers/AppError.js";
 import columns from "../../../models/columnsSchema/columnsSchema.js";
 import Tasks from "../../../models/tasksSchema/tasksSchema.js";
 import UserColumns from "../../../models/userColumnsSchema/userColumnsSchema.js";
@@ -5,10 +6,7 @@ import UserTasks from "../../../models/userTasksSchema/userTasksSchema.js";
 const deleteColumn = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const { columnId } = req.params;
-    if (!columnId) {
-      return next(new Error("columnId is required"));
-    }
+    const { columnId } = res.locals.safeParams;
 
     const userColumns = await UserColumns.findOneAndUpdate(
       { userId },
@@ -16,7 +14,11 @@ const deleteColumn = async (req, res, next) => {
       { returnDocument: "after" },
     );
     if (!userColumns) {
-      return next(new Error(`userColumns with id ${userId} was not found`));
+      const error = new AppError(
+        `userColumns with id ${userId} was not found`,
+        404,
+      );
+      return next(error);
     }
 
     const columnTodelete = await columns.findOneAndDelete({
@@ -24,23 +26,31 @@ const deleteColumn = async (req, res, next) => {
       userId,
     });
     if (!columnTodelete) {
-      return next(
-        new Error(
-          `column with id ${columnId} was not found during column deletion`,
-        ),
+      const error = new AppError(
+        "Failed to delete column: Column not found.",
+        404,
       );
+      return next(error);
     }
     const taskIds = await Tasks.distinct("id", { columnId, userId });
     if (!taskIds) {
-      return next(new Error("taskIds was not found during column deletion"));
+      const error = new AppError(
+        "unable to delete column: Associated taskIds not found.",
+        404,
+      );
+      return next(error);
     }
-    const userTasks = await UserTasks.findOneAndUpdate(
+    const userTask = await UserTasks.findOneAndUpdate(
       { userId },
       { $pull: { userTasks: { $in: taskIds } } },
       { returnDocument: "after" },
     );
-    if (!userTasks) {
-      return next(new Error("userTasks was not found during column deletion"));
+    if (!userTask) {
+      const error = new AppError(
+        "Failed to delete column: Associated task not found.",
+        404,
+      );
+      return next(error);
     }
     await Tasks.deleteMany({ columnId, userId });
 

@@ -32,6 +32,7 @@ const signup = async (req, res, next) => {
 
     const token = jwt.sign({ id: newUser._id }, JWT_SECRET_KEY, {
       expiresIn: "1d",
+      algorithm: "HS256",
     });
 
     return res

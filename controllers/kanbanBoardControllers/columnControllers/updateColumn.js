@@ -1,16 +1,10 @@
 import columns from "../../../models/columnsSchema/columnsSchema.js";
-
+import AppError from "../../../errorHandlers/AppError.js";
 const updateColumn = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const { columnId } = req.params;
-    if (!columnId) {
-      return next(new Error(`columnId is required`));
-    }
-    const { title } = req.body;
-    if (!title) {
-      return next(new Error(`title is required`));
-    }
+    const { columnId } = res.locals.safeParams;
+    const { title } = res.locals.safeBody;
 
     const columnToUpdate = await columns.findOneAndUpdate(
       { id: columnId, userId },

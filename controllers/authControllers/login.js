@@ -32,13 +32,13 @@ const login = async (req, res, next) => {
     const token = jwt.sign(
       { id: existingUser._id },
       process.env.JWT_SECRET_KEY,
-      { expiresIn: "1d" },
+      { expiresIn: "1d", algorithm: "HS256" },
     );
 
     return res
       .cookie("token", token, {
         httpOnly: true,
-        secure: false,
+        secure: process.env.NODE_ENV === "production",
         sameSite: "Strict",
         maxAge: 24 * 60 * 60 * 1000,
       })

@@ -6,6 +6,8 @@ import mongoose from "mongoose";
 import errorHandler from "./errorHandlers/errorHandler.js";
 import authRouter from "./routes/outhRoutes/outhRoutes.js";
 import cookieParser from "cookie-parser";
+import verifyToken from "./middlewares/verifyToken.js";
+
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT;
@@ -14,8 +16,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/user/", authRouter);
-app.use("/api/kanban-board/columns", columnRouter);
-app.use("/api/kanban-board/tasks", tasksRouter);
+app.use("/api/kanban-board/columns", verifyToken, columnRouter);
+app.use("/api/kanban-board/tasks", verifyToken, tasksRouter);
 
 app.use(errorHandler);
 mongoose

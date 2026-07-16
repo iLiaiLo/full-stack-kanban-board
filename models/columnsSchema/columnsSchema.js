@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import { randomUUID } from "crypto";
 const columnsSchema = new mongoose.Schema(
   {
     id: { type: "UUID", required: true, default: () => randomUUID() },

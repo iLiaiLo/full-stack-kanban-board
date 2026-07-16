@@ -4,11 +4,12 @@ import getTasks from "../../../controllers/kanbanBoardControllers/taskController
 import addTask from "../../../controllers/kanbanBoardControllers/taskControllers/addTask.js";
 import updateTask from "../../../controllers/kanbanBoardControllers/taskControllers/updateTask.js";
 import deleteTask from "../../../controllers/kanbanBoardControllers/taskControllers/deleteTask.js";
-import verifyToken from "../../../middlewares/verifyToken.js";
+import validateBody from "../../../middlewares/validation/validateBody.js";
+import validateTaskId from "../../../middlewares/validation/validateTaskId.js";
 
-tasksRouter.get("/", verifyToken, getTasks);
-tasksRouter.post("/:columnId", verifyToken, addTask);
-tasksRouter.put("/:taskId", verifyToken, updateTask);
-tasksRouter.delete("/:taskId", verifyToken, deleteTask);
+tasksRouter.get("/", getTasks);
+tasksRouter.post("/:columnId", validateBody, addTask);
+tasksRouter.put("/:taskId", validateTaskId, validateBody, updateTask);
+tasksRouter.delete("/:taskId", validateTaskId, deleteTask);
 
 export default tasksRouter;
